@@ -7,11 +7,13 @@ import { utilService } from '../../services/util.service.js'
 
 async function query(filterBy = { name: '' }) {
     try {
+        console.log('iwork')
         const criteria = {
             name: { $regex: filterBy.name, $options: 'i' }
         }
         const collection = await dbService.getCollection('toy')
         var toys = await collection.find(criteria).toArray()
+        console.log(toys)
         return toys
     } catch (err) {
         logger.error('cannot find toys', err)

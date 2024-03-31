@@ -1,0 +1,49 @@
+[
+  {
+    "name": "new toy",
+    "price": 200,
+    "labels": [
+      "Art",
+      "Baby"
+    ],
+    "inStock": true,
+    "createdAt": "2024-03-27T06:32:56.827Z",
+    "msgs": []
+  },
+  {
+    "name": "sony ps4",
+    "price": 400,
+    "labels": [
+      "Battery Powered",
+      "Box game"
+    ],
+    "inStock": true,
+    "createdAt": "2024-03-26T16:29:17.719Z",
+    "msgs": []
+  },
+  {
+    "name": "amet sss",
+    "price": 18,
+    "labels": [
+      "On wheels",
+      "Outdoor",
+      "Battery Powered",
+      "Box game"
+    ],
+    "createdAt": "1976-11-28T23:37:46.099Z",
+    "inStock": true,
+    "msgs": []
+  },
+  {
+    "name": "ac odio",
+    "price": 27,
+    "labels": [
+      "Art",
+      "Doll",
+      "Baby"
+    ],
+    "createdAt": "1990-07-28T23:36:15.927Z",
+    "inStock": false,
+    "msgs": []
+  }
+]

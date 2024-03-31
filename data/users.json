@@ -1,0 +1,30 @@
+[
+  {
+    "fullName": "Stav Yaar",
+    "username": "stu",
+    "password": "1234",
+    "isAdmin": false,
+    "createdAt": 1599074622555
+  },
+  {
+    "fullName": "Ricky Lake",
+    "username": "rick",
+    "password": "1234",
+    "isAdmin": false,
+    "createdAt": 1599073368512
+  },
+  {
+    "fullName": "Dainel",
+    "username": "dani",
+    "password": "secret",
+    "isAdmin": true,
+    "createdAt": 1598948593211
+  },
+  {
+    "fullName": "Stav Yaar Bar",
+    "username": "stav",
+    "password": "secret",
+    "isAdmin": true,
+    "createdAt": 1598928573211
+  }
+]

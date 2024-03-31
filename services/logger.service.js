@@ -1,11 +1,11 @@
-import fs  from 'fs'
+import fs from 'fs'
 
 const logsDir = './logs'
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir)
 }
 
-export const logger = {
+export const loggerService = {
     debug(...args) {
         if (process.env.NODE_NEV === 'production') return
         _doLog('DEBUG', ...args)
@@ -39,7 +39,7 @@ function _doLog(level, ...args) {
     var line = strs.join(' | ')
     line = `${_getTime()} - ${level} - ${line} \n`
     console.log(line)
-    fs.appendFile('./logs/backend.log', line, (err) =>{
+    fs.appendFile('./logs/backend.log', line, (err) => {
         if (err) console.log('FATAL: cannot write to log file')
     })
 }

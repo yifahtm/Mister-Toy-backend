@@ -17,6 +17,7 @@
         "cors": "^2.8.5",
         "cryptr": "^6.0.3",
         "express": "^4.17.1",
+        "follow-redirects": "^1.15.6",
         "mongodb": "^3.2.7"
     },
     "devDependencies": {

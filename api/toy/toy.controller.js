@@ -2,12 +2,30 @@ import { toyService } from './toy.service.js'
 import { logger } from '../../services/logger.service.js'
 
 export async function getToys(req, res) {
+    console.log('hi');
     try {
+        console.log('req.query', req.query)
+        // {
+        //   byName: 'aaa',
+        //   inStock: '',
+        //   sortBy: '', // name , price
+        //   byLable: [ 'Doll', 'Battery Powered' ]
+        // }
         const filterBy = {
-            name: req.query.name || '',
+            txt: req.query.byName || '',
+            status: req.query.inStock || null,
+            labels: req.query.byLable || null,
         }
+
+        const sortBy = req.query.sortBy
+            ? {
+                [req.query.sortBy]: 1,
+            }
+            : {}
+        console.log('sortBy', sortBy)
+
         logger.debug('Getting Toys', filterBy)
-        const toys = await toyService.query(filterBy)
+        const toys = await toyService.query(filterBy, sortBy)
         res.json(toys)
     } catch (err) {
         logger.error('Failed to get toys', err)
@@ -28,7 +46,7 @@ export async function getToyById(req, res) {
 
 export async function addToy(req, res) {
     const { loggedinUser } = req
-
+    console.log('here');
     try {
         const toy = req.body
         toy.owner = loggedinUser
@@ -64,11 +82,12 @@ export async function removeToy(req, res) {
 
 export async function addToyMsg(req, res) {
     const { loggedinUser } = req
+    const { _id, fullname } = loggedinUser
     try {
         const toyId = req.params.id
         const msg = {
             txt: req.body.txt,
-            by: loggedinUser,
+            by: { _id, fullname },
         }
         const savedMsg = await toyService.addToyMsg(toyId, msg)
         res.json(savedMsg)

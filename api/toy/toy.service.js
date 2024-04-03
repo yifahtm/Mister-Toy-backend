@@ -4,19 +4,22 @@ import { utilService } from '../../services/util.service.js'
 import mongodb from 'mongodb'
 const { ObjectId } = mongodb
 
+const PAGE_SIZE = 3
 
-async function query(filterBy, sortBy) {
+
+async function query(filterBy = { txt: '' }) {
     try {
-        console.log('filterBy', filterBy)
-        const criteria = _buildCriteria(filterBy)
-        console.log(criteria)
+        const criteria = {
+            vendor: { $regex: filterBy.txt, $options: 'i' }
+        }
         const collection = await dbService.getCollection('toy')
-        //sort({price:1}) from low to high
-        //sort({name:1}) from a to z //sort({key:order})
-        console.log('sortBy', sortBy)
+        var toyCursor = await collection.find(criteria)
 
-        const toys = await collection.find(criteria).sort(sortBy).toArray()
-        // console.log('toys', toys)
+        if (filterBy.pageIdx !== undefined) {
+            toyCursor.skip(filterBy.pageIdx * PAGE_SIZE).limit(PAGE_SIZE)
+        }
+
+        const toys = toyCursor.toArray()
         return toys
     } catch (err) {
         logger.error('cannot find toys', err)
@@ -27,7 +30,9 @@ async function query(filterBy, sortBy) {
 async function getById(toyId) {
     try {
         const collection = await dbService.getCollection('toy')
-        const toy = collection.findOne({ _id: new ObjectId(toyId) })
+        const toy = await collection.findOne({ _id: ObjectId(toyId) })
+        toy.createdAt = ObjectId(toy._id).getTimestamp()
+
         return toy
     } catch (err) {
         logger.error(`while finding toy ${toyId}`, err)
@@ -37,9 +42,9 @@ async function getById(toyId) {
 
 async function remove(toyId) {
     try {
-        console.log('workkkkks');
         const collection = await dbService.getCollection('toy')
-        await collection.deleteOne({ _id: new ObjectId(toyId) })
+        await collection.deleteOne({ _id: ObjectId(toyId) })
+        return toyId
     } catch (err) {
         logger.error(`cannot remove toy ${toyId}`, err)
         throw err
@@ -49,8 +54,7 @@ async function remove(toyId) {
 async function add(toy) {
     try {
         const collection = await dbService.getCollection('toy')
-        const { insertedId } = await collection.insertOne(toy)
-        toy._id = insertedId
+        await collection.insertOne(toy)
         return toy
     } catch (err) {
         logger.error('cannot insert toy', err)
@@ -61,33 +65,23 @@ async function add(toy) {
 async function update(toy) {
     try {
         const toyToSave = {
-            name: toy.name,
-            price: toy.price,
-            labels: toy.labels,
-            inStock: toy.inStock,
+            vendor: toy.vendor,
+            price: toy.price
         }
         const collection = await dbService.getCollection('toy')
-        await collection.updateOne(
-            { _id: new ObjectId(toy._id) },
-            { $set: toyToSave }
-        )
+        await collection.updateOne({ _id: ObjectId(toy._id) }, { $set: toyToSave })
         return toy
     } catch (err) {
-        logger.error(`cannot update toy ${toy._id}`, err)
+        logger.error(`cannot update toy ${toyId}`, err)
         throw err
     }
 }
 
 async function addToyMsg(toyId, msg) {
     try {
-
-
         msg.id = utilService.makeId()
         const collection = await dbService.getCollection('toy')
-        await collection.updateOne(
-            { _id: new ObjectId(toyId) },
-            { $push: { msgs: msg } }
-        )
+        await collection.updateOne({ _id: ObjectId(toyId) }, { $push: { msgs: msg } })
         return msg
     } catch (err) {
         logger.error(`cannot add toy msg ${toyId}`, err)
@@ -98,50 +92,12 @@ async function addToyMsg(toyId, msg) {
 async function removeToyMsg(toyId, msgId) {
     try {
         const collection = await dbService.getCollection('toy')
-        await collection.updateOne(
-            { _id: new ObjectId(toyId) },
-            { $pull: { msgs: { id: msgId } } }
-        )
+        await collection.updateOne({ _id: ObjectId(toyId) }, { $pull: { msgs: { id: msgId } } })
         return msgId
     } catch (err) {
-        logger.error(`cannot remove toy msg ${toyId}`, err)
+        logger.error(`cannot add toy msg ${toyId}`, err)
         throw err
     }
-}
-
-function _buildCriteria(filterBy) {
-    const { labels, txt, status } = filterBy
-
-    const criteria = {}
-
-    if (txt) {
-        criteria.name = { $regex: txt, $options: 'i' }
-    }
-
-    if (labels && labels.length) {
-        //every for objects labels
-        // const labelsCrit = labels.map(label => ({
-        //   labels: { $elemMatch: { title: label } },
-        // }))
-
-        //every for string labels
-        // const labelsCrit = labels.map((label) => ({
-        // 	labels: label,
-        // }))
-        // criteria.$and = labelsCrit
-        // criteria.labels =  { $all: labels }
-
-        // for some for string labels
-        console.log('labels', labels)
-        criteria.labels = { $in: labels } //['Doll']
-    }
-
-    if (status) {
-        criteria.inStock = status === 'true' ? true : false  // ? true : false
-    }
-    console.log('criteria', criteria)
-
-    return criteria
 }
 
 export const toyService = {
@@ -151,5 +107,5 @@ export const toyService = {
     add,
     update,
     addToyMsg,
-    removeToyMsg,
+    removeToyMsg
 }
